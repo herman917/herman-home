@@ -1,0 +1,1266 @@
+<!DOCTYPE html>
+<html lang="zh-Hant" data-theme="dark">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Herman Hsiao — 終身學習者" />
+  <title>Herman Hsiao</title>
+  <style>
+    /* ==========================================================================
+       1. 主題變數與色彩系統（深色科技風為主，支援淺色模式切換）
+       ========================================================================== */
+    :root {
+      --bg-base: #070b14;
+      --bg-gradient-1: rgba(56, 189, 248, 0.16);
+      --bg-gradient-2: rgba(129, 140, 248, 0.14);
+      --bg-gradient-3: rgba(16, 185, 129, 0.1);
+      --surface-glass: rgba(15, 23, 42, 0.62);
+      --surface-glass-hover: rgba(22, 33, 58, 0.78);
+      --surface-nav: rgba(7, 11, 20, 0.75);
+      --border-glass: rgba(148, 163, 184, 0.18);
+      --border-glow: rgba(56, 189, 248, 0.55);
+      --text-primary: #f1f5f9;
+      --text-secondary: #94a3b8;
+      --text-muted: #64748b;
+      --accent: #38bdf8;
+      --accent-2: #818cf8;
+      --accent-soft: rgba(56, 189, 248, 0.12);
+      --shadow-card: 0 12px 36px -12px rgba(2, 6, 23, 0.75);
+      --shadow-glow: 0 0 28px rgba(56, 189, 248, 0.24);
+      --avatar-ring: conic-gradient(from 120deg, #38bdf8, #818cf8, #34d399, #38bdf8);
+      --radius-lg: 20px;
+      --radius-md: 14px;
+      --radius-sm: 999px;
+      --transition: 0.28s cubic-bezier(0.22, 1, 0.36, 1);
+      color-scheme: dark;
+    }
+
+    html[data-theme='light'] {
+      --bg-base: #f1f5f9;
+      --bg-gradient-1: rgba(14, 165, 233, 0.16);
+      --bg-gradient-2: rgba(99, 102, 241, 0.12);
+      --bg-gradient-3: rgba(16, 185, 129, 0.1);
+      --surface-glass: rgba(255, 255, 255, 0.72);
+      --surface-glass-hover: rgba(255, 255, 255, 0.92);
+      --surface-nav: rgba(241, 245, 249, 0.78);
+      --border-glass: rgba(15, 23, 42, 0.1);
+      --border-glow: rgba(2, 132, 199, 0.48);
+      --text-primary: #0f172a;
+      --text-secondary: #475569;
+      --text-muted: #64748b;
+      --accent: #0284c7;
+      --accent-2: #4f46e5;
+      --accent-soft: rgba(2, 132, 199, 0.1);
+      --shadow-card: 0 12px 32px -12px rgba(15, 23, 42, 0.14);
+      --shadow-glow: 0 0 24px rgba(2, 132, 199, 0.18);
+      color-scheme: light;
+    }
+
+    /* ==========================================================================
+       2. 基礎重置與背景氛圍
+       ========================================================================== */
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      scroll-padding-top: 84px;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang TC',
+        'Microsoft JhengHei', 'Noto Sans TC', sans-serif;
+      background-color: var(--bg-base);
+      color: var(--text-primary);
+      line-height: 1.65;
+      min-height: 100vh;
+      overflow-x: hidden;
+      transition: background-color var(--transition), color var(--transition);
+    }
+
+    /* 背景光暈與細微科技網格 */
+    .bg-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      pointer-events: none;
+      background:
+        radial-gradient(circle at 15% 18%, var(--bg-gradient-1), transparent 42%),
+        radial-gradient(circle at 85% 22%, var(--bg-gradient-2), transparent 40%),
+        radial-gradient(circle at 50% 85%, var(--bg-gradient-3), transparent 45%);
+    }
+
+    .bg-backdrop::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(to right, var(--border-glass) 1px, transparent 1px),
+        linear-gradient(to bottom, var(--border-glass) 1px, transparent 1px);
+      background-size: 48px 48px;
+      opacity: 0.25;
+      mask-image: radial-gradient(ellipse at center, black 35%, transparent 80%);
+      -webkit-mask-image: radial-gradient(ellipse at center, black 35%, transparent 80%);
+    }
+
+    .container {
+      width: min(1120px, 92vw);
+      margin-inline: auto;
+    }
+
+    /* ==========================================================================
+       3. 頂部導覽列（Glassmorphism Sticky Navbar）
+       ========================================================================== */
+    .navbar {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      background: var(--surface-nav);
+      border-bottom: 1px solid var(--border-glass);
+    }
+
+    .nav-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      height: 64px;
+    }
+
+    .brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: var(--text-primary);
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      font-size: 1.05rem;
+      white-space: nowrap;
+    }
+
+    .brand-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      box-shadow: 0 0 12px var(--accent);
+    }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      display: inline-flex;
+      align-items: center;
+      padding: 8px 14px;
+      border-radius: var(--radius-sm);
+      color: var(--text-secondary);
+      text-decoration: none;
+      font-size: 0.94rem;
+      font-weight: 500;
+      transition: color var(--transition), background-color var(--transition);
+    }
+
+    .nav-links a:hover,
+    .nav-links a:focus-visible {
+      color: var(--text-primary);
+      background: var(--accent-soft);
+      outline: none;
+    }
+
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .theme-toggle {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 8px 12px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-glass);
+      background: var(--surface-glass);
+      color: var(--text-primary);
+      cursor: pointer;
+      font-size: 0.88rem;
+      font-weight: 500;
+      transition: border-color var(--transition), box-shadow var(--transition), transform var(--transition);
+    }
+
+    .theme-toggle:hover {
+      border-color: var(--border-glow);
+      box-shadow: var(--shadow-glow);
+      transform: translateY(-1px);
+    }
+
+    .theme-toggle svg {
+      width: 17px;
+      height: 17px;
+      flex-shrink: 0;
+    }
+
+    /* ==========================================================================
+       4. Hero / 關於我區塊
+       ========================================================================== */
+    .hero {
+      padding: 64px 0 40px;
+    }
+
+    .hero-card {
+      position: relative;
+      display: grid;
+      grid-template-columns: auto 1fr;
+      align-items: center;
+      gap: 36px;
+      padding: 40px;
+      border-radius: var(--radius-lg);
+      background: var(--surface-glass);
+      border: 1px solid var(--border-glass);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      box-shadow: var(--shadow-card);
+    }
+
+    /* 頭像微光環 */
+    .avatar-wrap {
+      position: relative;
+      width: 156px;
+      height: 156px;
+      border-radius: 50%;
+      padding: 4px;
+      background: var(--avatar-ring);
+      box-shadow: 0 0 36px rgba(56, 189, 248, 0.28), 0 12px 24px rgba(2, 6, 23, 0.45);
+      flex-shrink: 0;
+    }
+
+    .avatar-inner {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      overflow: hidden;
+      background: var(--bg-base);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 3px solid var(--bg-base);
+    }
+
+    .avatar-inner img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .avatar-fallback {
+      width: 64%;
+      height: 64%;
+      color: var(--accent);
+      opacity: 0.88;
+    }
+
+    .hero-content h1 {
+      font-size: clamp(1.75rem, 3.4vw, 2.5rem);
+      font-weight: 800;
+      letter-spacing: -0.01em;
+      line-height: 1.2;
+      margin-bottom: 10px;
+    }
+
+    .hero-name-en {
+      background: linear-gradient(120deg, var(--accent), var(--accent-2));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .hero-tagline {
+      display: inline-block;
+      padding: 6px 14px;
+      margin-bottom: 16px;
+      border-radius: var(--radius-sm);
+      background: var(--accent-soft);
+      border: 1px solid rgba(56, 189, 248, 0.25);
+      color: var(--accent);
+      font-size: 0.95rem;
+      font-weight: 600;
+      letter-spacing: 0.03em;
+    }
+
+    .hero-bio {
+      color: var(--text-secondary);
+      font-size: 1rem;
+      max-width: 64ch;
+      margin-bottom: 22px;
+    }
+
+    .hero-cta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .btn-primary,
+    .btn-ghost {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 20px;
+      border-radius: var(--radius-sm);
+      font-size: 0.94rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: transform var(--transition), box-shadow var(--transition), border-color var(--transition);
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--accent), var(--accent-2));
+      color: #ffffff;
+      box-shadow: 0 8px 20px -6px rgba(56, 189, 248, 0.5);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 26px -6px rgba(56, 189, 248, 0.65);
+    }
+
+    .btn-ghost {
+      background: var(--surface-glass);
+      color: var(--text-primary);
+      border: 1px solid var(--border-glass);
+    }
+
+    .btn-ghost:hover {
+      transform: translateY(-2px);
+      border-color: var(--border-glow);
+      box-shadow: var(--shadow-glow);
+    }
+
+    /* ==========================================================================
+       5. 區塊共用標題樣式
+       ========================================================================== */
+    section.section {
+      padding: 44px 0;
+    }
+
+    .section-header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 26px;
+    }
+
+    .section-eyebrow {
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 4px;
+    }
+
+    .section-title {
+      font-size: clamp(1.4rem, 2.5vw, 1.85rem);
+      font-weight: 700;
+      letter-spacing: -0.01em;
+    }
+
+    .section-subtitle {
+      color: var(--text-secondary);
+      font-size: 0.95rem;
+    }
+
+    /* ==========================================================================
+       6. 照片走廊（Photo Gallery）
+       ========================================================================== */
+    .gallery-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 185px));
+      justify-content: center;
+      gap: 16px;
+    }
+
+    .gallery-item {
+      position: relative;
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      background: var(--surface-glass);
+      border: 1px solid var(--border-glass);
+      box-shadow: var(--shadow-card);
+      cursor: pointer;
+      aspect-ratio: 4 / 3;
+      transition: transform var(--transition), border-color var(--transition), box-shadow var(--transition);
+    }
+
+    .gallery-item:hover,
+    .gallery-item:focus-visible {
+      transform: translateY(-4px);
+      border-color: var(--border-glow);
+      box-shadow: var(--shadow-card), var(--shadow-glow);
+      outline: none;
+    }
+
+    .gallery-item img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    .gallery-item:hover img {
+      transform: scale(1.05);
+    }
+
+    .gallery-caption {
+      position: absolute;
+      inset-inline: 0;
+      bottom: 0;
+      padding: 18px 10px 8px;
+      background: linear-gradient(to top, rgba(2, 6, 23, 0.85), transparent);
+      color: #f8fafc;
+      font-size: 0.8rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 6px;
+    }
+
+    .gallery-zoom-hint {
+      font-size: 0.7rem;
+      font-weight: 500;
+      color: #cbd5e1;
+      opacity: 0.85;
+    }
+
+    .gallery-empty,
+    .gallery-error {
+      grid-column: 1 / -1;
+      padding: 36px 20px;
+      text-align: center;
+      border-radius: var(--radius-md);
+      background: var(--surface-glass);
+      border: 1px dashed var(--border-glass);
+      color: var(--text-secondary);
+    }
+
+    /* ==========================================================================
+       7. 精選作品集（Portfolio）
+       ========================================================================== */
+    .filter-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .filter-btn {
+      padding: 6px 14px;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-glass);
+      background: var(--surface-glass);
+      color: var(--text-secondary);
+      font-size: 0.86rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all var(--transition);
+    }
+
+    .filter-btn:hover {
+      color: var(--text-primary);
+      border-color: var(--border-glow);
+    }
+
+    .filter-btn.active {
+      background: var(--accent-soft);
+      color: var(--accent);
+      border-color: var(--border-glow);
+      font-weight: 600;
+    }
+
+    .portfolio-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+      gap: 22px;
+    }
+
+    .project-card {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 18px;
+      padding: 24px;
+      border-radius: var(--radius-md);
+      background: var(--surface-glass);
+      border: 1px solid var(--border-glass);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      box-shadow: var(--shadow-card);
+      text-decoration: none;
+      color: inherit;
+      transition: transform var(--transition), border-color var(--transition),
+        box-shadow var(--transition), background-color var(--transition);
+    }
+
+    .project-card:hover,
+    .project-card:focus-visible {
+      transform: translateY(-6px);
+      background: var(--surface-glass-hover);
+      border-color: var(--border-glow);
+      box-shadow: var(--shadow-card), var(--shadow-glow);
+      outline: none;
+    }
+
+    .project-top {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .project-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      display: grid;
+      place-items: center;
+      background: var(--accent-soft);
+      border: 1px solid rgba(56, 189, 248, 0.25);
+      color: var(--accent);
+      flex-shrink: 0;
+    }
+
+    .project-icon svg {
+      width: 22px;
+      height: 22px;
+    }
+
+    .project-tags {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      gap: 6px;
+    }
+
+    .tag-pill {
+      padding: 4px 10px;
+      border-radius: var(--radius-sm);
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-size: 0.76rem;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+    }
+
+    .project-title {
+      font-size: 1.18rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: var(--text-primary);
+    }
+
+    .project-desc {
+      font-size: 0.94rem;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+
+    .project-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: 14px;
+      border-top: 1px solid var(--border-glass);
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--accent);
+    }
+
+    .project-arrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: transform var(--transition);
+    }
+
+    .project-card:hover .project-arrow {
+      transform: translate(3px, -2px);
+    }
+
+    /* ==========================================================================
+       8. 燈箱預覽（Lightbox）
+       ========================================================================== */
+    .lightbox {
+      position: fixed;
+      inset: 0;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(2, 6, 23, 0.9);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.25s ease, visibility 0.25s ease;
+      padding: 20px;
+      touch-action: pan-y;
+    }
+
+    .lightbox.open {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .lightbox-stage {
+      position: relative;
+      max-width: min(92vw, 1080px);
+      max-height: 84vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .lightbox-stage img {
+      max-width: 100%;
+      max-height: calc(84vh - 48px);
+      border-radius: 12px;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.65);
+      object-fit: contain;
+      user-select: none;
+    }
+
+    .lightbox-meta {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      color: #e2e8f0;
+      font-size: 0.95rem;
+    }
+
+    .lightbox-counter {
+      padding: 2px 10px;
+      border-radius: var(--radius-sm);
+      background: rgba(255, 255, 255, 0.12);
+      font-size: 0.82rem;
+    }
+
+    .lightbox-btn {
+      position: fixed;
+      display: grid;
+      place-items: center;
+      width: 46px;
+      height: 46px;
+      border-radius: 50%;
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      background: rgba(15, 23, 42, 0.72);
+      color: #f8fafc;
+      cursor: pointer;
+      transition: background-color 0.2s ease, transform 0.2s ease;
+    }
+
+    .lightbox-btn:hover {
+      background: rgba(56, 189, 248, 0.35);
+      transform: scale(1.06);
+    }
+
+    .lightbox-close {
+      top: 18px;
+      right: 18px;
+    }
+
+    .lightbox-prev {
+      left: 18px;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+
+    .lightbox-next {
+      right: 18px;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+
+    .lightbox-prev:hover,
+    .lightbox-next:hover {
+      transform: translateY(-50%) scale(1.06);
+    }
+
+    /* ==========================================================================
+       9. 頁尾
+       ========================================================================== */
+    footer {
+      padding: 36px 0 48px;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.88rem;
+      border-top: 1px solid var(--border-glass);
+      margin-top: 32px;
+    }
+
+    /* ==========================================================================
+       10. RWD 響應式斷點（平板 / 手機直向與橫向）
+       ========================================================================== */
+    @media (max-width: 768px) {
+      .hero {
+        padding: 36px 0 24px;
+      }
+
+      .hero-card {
+        grid-template-columns: 1fr;
+        text-align: center;
+        padding: 28px 22px;
+        gap: 22px;
+      }
+
+      .avatar-wrap {
+        margin-inline: auto;
+        width: 132px;
+        height: 132px;
+      }
+
+      .hero-cta {
+        justify-content: center;
+      }
+
+      .nav-links a {
+        padding: 6px 10px;
+        font-size: 0.88rem;
+      }
+
+      .theme-label {
+        display: none;
+      }
+
+      .lightbox-prev {
+        left: 10px;
+      }
+
+      .lightbox-next {
+        right: 10px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .nav-inner {
+        height: auto;
+        min-height: 58px;
+        padding-block: 8px;
+        flex-wrap: wrap;
+      }
+
+      .nav-links {
+        order: 3;
+        width: 100%;
+        justify-content: center;
+        border-top: 1px solid var(--border-glass);
+        padding-top: 6px;
+      }
+
+      .portfolio-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .gallery-grid {
+        grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+        gap: 10px;
+      }
+    }
+
+    /* 手機橫向高度較低時，確保燈箱按鈕不遮擋圖片 */
+    @media (max-height: 500px) and (orientation: landscape) {
+      .hero {
+        padding: 24px 0;
+      }
+
+      .lightbox-stage img {
+        max-height: 76vh;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="bg-backdrop" aria-hidden="true"></div>
+
+  <!-- 頂部導覽列 -->
+  <header class="navbar">
+    <div class="container nav-inner">
+      <a class="brand" href="#about">
+        <span class="brand-dot" aria-hidden="true"></span>
+        <span>Herman Hsiao</span>
+      </a>
+
+      <nav aria-label="主導覽">
+        <ul class="nav-links">
+          <li><a href="#about">關於我</a></li>
+          <li><a href="#gallery">照片走廊</a></li>
+          <li><a href="#portfolio">作品集</a></li>
+        </ul>
+      </nav>
+
+      <div class="nav-actions">
+        <button id="themeToggle" class="theme-toggle" type="button" aria-label="切換深色或淺色模式" title="切換深色／淺色模式">
+          <svg id="themeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"></svg>
+          <span class="theme-label" id="themeLabel">淺色模式</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- 關於我 Hero 區塊 -->
+    <section id="about" class="hero" aria-label="個人基本資訊">
+      <div class="hero-card">
+        <div class="avatar-wrap">
+          <div class="avatar-inner" id="avatarContainer">
+            <img src="photo/herman.jpg" alt="Herman Hsiao大頭貼" id="avatarImg" />
+          </div>
+        </div>
+
+        <div class="hero-content">
+          <h1>
+            <span class="hero-name-en">Herman Hsiao</span>
+          </h1>
+          <p class="hero-tagline">健康 ｜ 快樂 ｜ 學習</p>
+          <p class="hero-bio">
+            一個平凡的終身學習者
+          </p>
+          <div class="hero-cta">
+            <a class="btn-primary" href="#portfolio">探索精選作品</a>
+            <a class="btn-ghost" href="#gallery">瀏覽照片走廊</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 照片走廊區塊 -->
+    <section id="gallery" class="section" aria-labelledby="galleryHeading">
+      <div class="section-header">
+        <div>
+          <p class="section-eyebrow">Photo Gallery</p>
+          <h2 class="section-title" id="galleryHeading">照片走廊</h2>
+        </div>
+        <p class="section-subtitle">點擊任一張照片可放大檢視，支援鍵盤與手機滑動切換</p>
+      </div>
+
+      <div id="galleryGrid" class="gallery-grid" role="list"></div>
+    </section>
+
+    <!-- 精選作品集區塊 -->
+    <section id="portfolio" class="section" aria-labelledby="portfolioHeading">
+      <div class="section-header">
+        <div>
+          <p class="section-eyebrow">Selected Works</p>
+          <h2 class="section-title" id="portfolioHeading">精選作品集</h2>
+        </div>
+
+        <div class="filter-bar" id="filterBar" role="tablist" aria-label="作品分類篩選"></div>
+      </div>
+
+      <div id="portfolioGrid" class="portfolio-grid"></div>
+    </section>
+  </main>
+
+  <footer>
+    <div class="container">
+      <p>&copy; <span id="currentYear"></span> Herman Hsiao. Built with HTML5, CSS3 &amp; Vanilla JS.</p>
+    </div>
+  </footer>
+
+  <!-- 燈箱預覽元件 -->
+  <div id="lightbox" class="lightbox" role="dialog" aria-modal="true" aria-label="照片放大預覽" aria-hidden="true">
+    <button id="lightboxClose" class="lightbox-btn lightbox-close" type="button" aria-label="關閉預覽 (ESC)"
+      title="關閉 (ESC)">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round">
+        <line x1="18" y1="6" x2="6" y2="18" />
+        <line x1="6" y1="6" x2="18" y2="18" />
+      </svg>
+    </button>
+
+    <button id="lightboxPrev" class="lightbox-btn lightbox-prev" type="button" aria-label="上一張照片" title="上一張 (←)">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="15 18 9 12 15 6" />
+      </svg>
+    </button>
+
+    <div class="lightbox-stage">
+      <img id="lightboxImg" src="" alt="" />
+      <div class="lightbox-meta">
+        <span id="lightboxCaption"></span>
+        <span class="lightbox-counter" id="lightboxCounter"></span>
+      </div>
+    </div>
+
+    <button id="lightboxNext" class="lightbox-btn lightbox-next" type="button" aria-label="下一張照片" title="下一張 (→)">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="9 18 15 12 9 6" />
+      </svg>
+    </button>
+  </div>
+
+  <script>
+    // =========================================================================
+    // 【照片走廊資料設定區】
+    // 使用方式：
+    // 1. 直接填入相對於 index.html 的照片路徑字串，例如 'photo/01.jpg'
+    // 2. 若想自訂顯示標題，也可改用物件：{ src: 'photo/01.jpg', caption: '活動紀錄' }
+    // 3. 大頭貼為 photo/herman.jpg，建議勿重複放入此陣列
+    // =========================================================================
+    const galleryImages = [
+      'photo/herman01.jpg',
+      'photo/herman02.jpg',
+      'photo/herman03.jpg',
+      'photo/herman04.jpg',
+    ]
+
+    // =========================================================================
+    // 【精選作品集資料設定區】
+    // 使用方式：複製任一物件區塊貼到陣列中即可新增作品
+    // - title: 作品名稱
+    // - url: 作品網址（點擊後會以新分頁開啟）
+    // - category: 篩選分類（'金融量化' | '互動遊戲' | '教學與健康'）
+    // - tags: 顯示在卡片右上角的標籤陣列
+    // - description: 作品簡介
+    // - icon: 對應下方 iconMap 的圖示鍵名（'health' | 'chart' | 'trend' | 'puzzle' | 'physics' | 'arcade'）
+    // =========================================================================
+    const portfolioItems = [
+      {
+        title: '葉子老師猿猴式超慢跑',
+        url: 'https://herman917.github.io/YehZhi/',
+        category: '教學與健康',
+        tags: ['健康運動', '數位手冊'],
+        description: '行動版超慢跑教學與社群資源整合手冊。',
+        icon: 'health',
+      },
+      {
+        title: '台股 ETF 績效排行查詢',
+        url: 'https://etftop30.streamlit.app',
+        category: '金融量化',
+        tags: ['Python', '金融數據'],
+        description: '台股非槓桿 ETF 多週期歷史績效與排行分析工具。',
+        icon: 'chart',
+      },
+      {
+        title: '台股多空趨勢預測系統',
+        url: 'https://herman917.github.io/StockTred/',
+        category: '金融量化',
+        tags: ['量化分析', '市場指標'],
+        description: '結合匯率、波動率與法人籌碼的台股多空趨勢儀表板。',
+        icon: 'trend',
+      },
+      {
+        title: '孔明四 T 入圓',
+        url: 'https://herman917.github.io/4TPuzzle/',
+        category: '互動遊戲',
+        tags: ['HTML5 Canvas', '益智遊戲'],
+        description: '經典幾何拼圖互動網頁遊戲，支援拖曳與旋轉操作。',
+        icon: 'puzzle',
+      },
+      {
+        title: '硬幣滾動悖論模擬器',
+        url: 'https://herman917.github.io/CoinRotation/',
+        category: '教學與健康',
+        tags: ['物理模擬', '視覺化教學'],
+        description: '透過硬幣尺寸與倍率動態演示硬幣滾動悖論的互動模擬器。',
+        icon: 'physics',
+      },
+      {
+        title: '1943：中途島海戰',
+        url: 'https://herman917.github.io/Game_1943/',
+        category: '互動遊戲',
+        tags: ['街機射擊', '網頁遊戲'],
+        description: '致敬經典街機的直向/橫向雙模式飛行射擊遊戲，內建三種難度。',
+        icon: 'arcade',
+      },
+    ]
+
+    // 作品分類專屬 SVG 圖示
+    const iconMap = {
+      health: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>',
+      chart: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>',
+      trend: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>',
+      puzzle: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 3v18M3 12h18"/></svg>',
+      physics: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><circle cx="18" cy="12" r="2.5"/><path d="M12 2a10 10 0 0 1 10 10"/></svg>',
+      arcade: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 19 21 12 17 5 21 12 2"/></svg>',
+    }
+
+    // =========================================================================
+    // 1. 大頭貼載入失敗替代圖示
+    // =========================================================================
+    const avatarImg = document.getElementById('avatarImg')
+    const avatarContainer = document.getElementById('avatarContainer')
+
+    avatarImg.addEventListener('error', () => {
+      avatarContainer.innerHTML = `
+        <svg class="avatar-fallback" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-label="預設頭像圖示">
+          <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+          <circle cx="12" cy="7" r="4" />
+        </svg>
+      `
+    })
+
+    // =========================================================================
+    // 2. 深色 / 淺色模式切換（持久化至 localStorage）
+    // =========================================================================
+    const rootEl = document.documentElement
+    const themeToggleBtn = document.getElementById('themeToggle')
+    const themeIcon = document.getElementById('themeIcon')
+    const themeLabel = document.getElementById('themeLabel')
+
+    const sunIcon = '<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>'
+    const moonIcon = '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>'
+
+    function applyTheme(theme) {
+      rootEl.setAttribute('data-theme', theme)
+      localStorage.setItem('herman-theme', theme)
+      const isDark = theme === 'dark'
+      themeIcon.innerHTML = isDark ? sunIcon : moonIcon
+      themeLabel.textContent = isDark ? '淺色模式' : '深色模式'
+    }
+
+    const savedTheme = localStorage.getItem('herman-theme')
+    const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches
+    applyTheme(savedTheme || (prefersDark ? 'dark' : 'dark'))
+
+    themeToggleBtn.addEventListener('click', () => {
+      const next = rootEl.getAttribute('data-theme') === 'dark' ? 'light' : 'dark'
+      applyTheme(next)
+    })
+
+    // =========================================================================
+    // 3. 照片走廊渲染與燈箱預覽（含鍵盤與手機滑動手勢）
+    // =========================================================================
+    const galleryGrid = document.getElementById('galleryGrid')
+    const lightbox = document.getElementById('lightbox')
+    const lightboxImg = document.getElementById('lightboxImg')
+    const lightboxCaption = document.getElementById('lightboxCaption')
+    const lightboxCounter = document.getElementById('lightboxCounter')
+    const lightboxClose = document.getElementById('lightboxClose')
+    const lightboxPrev = document.getElementById('lightboxPrev')
+    const lightboxNext = document.getElementById('lightboxNext')
+
+    // 正規化照片資料，支援純字串路徑或 { src, caption } 物件
+    const normalizedPhotos = galleryImages.map((item) => {
+      if (typeof item === 'string') {
+        const fileName = item.split('/').pop() || item
+        const caption = fileName.replace(/\.[^/.]+$/, '')
+        return { src: item, caption }
+      }
+      return {
+        src: item.src,
+        caption: item.caption || (item.src.split('/').pop() || '').replace(/\.[^/.]+$/, ''),
+      }
+    })
+
+    let currentPhotoIndex = 0
+    let touchStartX = 0
+    let touchEndX = 0
+
+    function renderGallery() {
+      if (normalizedPhotos.length === 0) {
+        galleryGrid.innerHTML = '<div class="gallery-empty">尚未設定照片，請於 JavaScript 的 <code>galleryImages</code> 陣列中加入照片路徑。</div>'
+        return
+      }
+
+      galleryGrid.innerHTML = ''
+      normalizedPhotos.forEach((photo, index) => {
+        const card = document.createElement('div')
+        card.className = 'gallery-item'
+        card.setAttribute('role', 'listitem')
+        card.setAttribute('tabindex', '0')
+        card.setAttribute('aria-label', `檢視照片：${photo.caption}`)
+
+        const img = document.createElement('img')
+        img.src = photo.src
+        img.alt = photo.caption
+        img.loading = 'lazy'
+        img.addEventListener('error', () => {
+          card.innerHTML = `<div class="gallery-error">無法載入照片<br><small>${photo.src}</small></div>`
+        })
+
+        const caption = document.createElement('div')
+        caption.className = 'gallery-caption'
+        caption.innerHTML = `<span>${photo.caption}</span><span class="gallery-zoom-hint">點擊放大</span>`
+
+        card.appendChild(img)
+        card.appendChild(caption)
+
+        const handleOpen = () => openLightbox(index)
+        card.addEventListener('click', handleOpen)
+        card.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault()
+            handleOpen()
+          }
+        })
+
+        galleryGrid.appendChild(card)
+      })
+    }
+
+    function updateLightboxView() {
+      const photo = normalizedPhotos[currentPhotoIndex]
+      if (!photo) return
+      lightboxImg.src = photo.src
+      lightboxImg.alt = photo.caption
+      lightboxCaption.textContent = photo.caption
+      lightboxCounter.textContent = `${currentPhotoIndex + 1} / ${normalizedPhotos.length}`
+    }
+
+    function openLightbox(index) {
+      currentPhotoIndex = index
+      updateLightboxView()
+      lightbox.classList.add('open')
+      lightbox.setAttribute('aria-hidden', 'false')
+      document.body.style.overflow = 'hidden'
+    }
+
+    function closeLightbox() {
+      lightbox.classList.remove('open')
+      lightbox.setAttribute('aria-hidden', 'true')
+      document.body.style.overflow = ''
+    }
+
+    function showPrevPhoto() {
+      if (normalizedPhotos.length === 0) return
+      currentPhotoIndex = (currentPhotoIndex - 1 + normalizedPhotos.length) % normalizedPhotos.length
+      updateLightboxView()
+    }
+
+    function showNextPhoto() {
+      if (normalizedPhotos.length === 0) return
+      currentPhotoIndex = (currentPhotoIndex + 1) % normalizedPhotos.length
+      updateLightboxView()
+    }
+
+    lightboxClose.addEventListener('click', closeLightbox)
+    lightboxPrev.addEventListener('click', showPrevPhoto)
+    lightboxNext.addEventListener('click', showNextPhoto)
+
+    lightbox.addEventListener('click', (e) => {
+      if (e.target === lightbox) closeLightbox()
+    })
+
+    document.addEventListener('keydown', (e) => {
+      if (!lightbox.classList.contains('open')) return
+      if (e.key === 'Escape') closeLightbox()
+      if (e.key === 'ArrowLeft') showPrevPhoto()
+      if (e.key === 'ArrowRight') showNextPhoto()
+    })
+
+    // 手機左右滑動手勢切換照片
+    lightbox.addEventListener('touchstart', (e) => {
+      touchStartX = e.changedTouches[0].screenX
+    }, { passive: true })
+
+    lightbox.addEventListener('touchend', (e) => {
+      touchEndX = e.changedTouches[0].screenX
+      const deltaX = touchEndX - touchStartX
+      if (Math.abs(deltaX) < 40) return
+      if (deltaX > 0) {
+        showPrevPhoto()
+      } else {
+        showNextPhoto()
+      }
+    }, { passive: true })
+
+    // =========================================================================
+    // 4. 精選作品集渲染與分類篩選
+    // =========================================================================
+    const filterBar = document.getElementById('filterBar')
+    const portfolioGrid = document.getElementById('portfolioGrid')
+    let activeCategory = '全部'
+
+    function renderFilters() {
+      const categories = ['全部', ...new Set(portfolioItems.map((item) => item.category))]
+      filterBar.innerHTML = ''
+      categories.forEach((cat) => {
+        const btn = document.createElement('button')
+        btn.type = 'button'
+        btn.className = `filter-btn${cat === activeCategory ? ' active' : ''}`
+        btn.textContent = cat
+        btn.setAttribute('role', 'tab')
+        btn.setAttribute('aria-selected', String(cat === activeCategory))
+        btn.addEventListener('click', () => {
+          activeCategory = cat
+          renderFilters()
+          renderPortfolio()
+        })
+        filterBar.appendChild(btn)
+      })
+    }
+
+    function renderPortfolio() {
+      const filtered = activeCategory === '全部'
+        ? portfolioItems
+        : portfolioItems.filter((item) => item.category === activeCategory)
+
+      portfolioGrid.innerHTML = ''
+      filtered.forEach((project) => {
+        const card = document.createElement('a')
+        card.className = 'project-card'
+        card.href = project.url
+        card.target = '_blank'
+        card.rel = 'noopener noreferrer'
+        card.setAttribute('aria-label', `${project.title}（在新分頁開啟）`)
+
+        const tagsHtml = project.tags
+          .map((tag) => `<span class="tag-pill">${tag}</span>`)
+          .join('')
+
+        const iconSvg = iconMap[project.icon] || iconMap.chart
+
+        card.innerHTML = `
+          <div>
+            <div class="project-top">
+              <div class="project-icon" aria-hidden="true">${iconSvg}</div>
+              <div class="project-tags">${tagsHtml}</div>
+            </div>
+            <h3 class="project-title" style="margin-top: 16px;">${project.title}</h3>
+            <p class="project-desc">${project.description}</p>
+          </div>
+          <div class="project-footer">
+            <span>前往專案</span>
+            <span class="project-arrow" aria-hidden="true">↗</span>
+          </div>
+        `
+        portfolioGrid.appendChild(card)
+      })
+    }
+
+    // =========================================================================
+    // 5. 初始化執行
+    // =========================================================================
+    document.getElementById('currentYear').textContent = new Date().getFullYear()
+    renderGallery()
+    renderFilters()
+    renderPortfolio()
+  </script>
+</body>
+
+</html>
