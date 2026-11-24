@@ -1103,12 +1103,7 @@
           card.innerHTML = `<div class="gallery-error">無法載入照片<br><small>${photo.src}</small></div>`
         })
 
-        const caption = document.createElement('div')
-        caption.className = 'gallery-caption'
-        caption.innerHTML = `<span>${photo.caption}</span><span class="gallery-zoom-hint">點擊放大</span>`
-
         card.appendChild(img)
-        card.appendChild(caption)
 
         const handleOpen = () => openLightbox(index)
         card.addEventListener('click', handleOpen)
