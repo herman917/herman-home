@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://herman917.github.io/herman-home/sitemap.xml
