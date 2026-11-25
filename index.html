@@ -662,10 +662,7 @@
        7.5 訪客留言板（Guestbook）
        ========================================================================== */
     .guestbook-layout {
-      display: grid;
-      grid-template-columns: minmax(280px, 380px) 1fr;
-      gap: 20px;
-      align-items: start;
+      max-width: 560px;
     }
 
     .guestbook-card {
@@ -1119,12 +1116,6 @@
             <div id="gbStatus" class="guestbook-status" aria-live="polite"></div>
           </form>
         </div>
-
-        <div class="guestbook-card">
-          <div id="guestbookList" class="guestbook-list">
-            <div class="guestbook-empty">載入留言中...</div>
-          </div>
-        </div>
       </div>
     </section>
   </main>
@@ -1504,7 +1495,6 @@
     const gbMessageInput = document.getElementById('gbMessage')
     const gbSubmitBtn = document.getElementById('gbSubmitBtn')
     const gbStatusEl = document.getElementById('gbStatus')
-    const guestbookListEl = document.getElementById('guestbookList')
 
     let cachedClientIp = '未知'
 
@@ -1519,14 +1509,6 @@
         cachedClientIp = '未知'
       }
       return cachedClientIp
-    }
-
-    function escapeHtml(str) {
-      return String(str)
-        .replace(/&/g, '&amp;')
-        .replace(/</g, '&lt;')
-        .replace(/>/g, '&gt;')
-        .replace(/"/g, '&quot;')
     }
 
     function setVisitDisplay(val) {
@@ -1551,45 +1533,6 @@
         }
       } catch (err) {
         setVisitDisplay('--')
-      }
-    }
-
-    function renderGuestbook(items) {
-      if (!items || items.length === 0) {
-        guestbookListEl.innerHTML = '<div class="guestbook-empty">目前尚無留言，歡迎搶先留言！</div>'
-        return
-      }
-      guestbookListEl.innerHTML = items
-        .map(
-          (item) => `
-          <div class="guestbook-item">
-            <div class="guestbook-item-head">
-              <span class="guestbook-author">${escapeHtml(item.name)}</span>
-              <span class="guestbook-time">${escapeHtml(item.time)}</span>
-            </div>
-            <div class="guestbook-msg">${escapeHtml(item.message)}</div>
-          </div>
-        `
-        )
-        .join('')
-    }
-
-    async function loadGuestbook() {
-      if (!GAS_ENDPOINT) {
-        guestbookListEl.innerHTML =
-          '<div class="guestbook-empty">尚未設定 Google Apps Script 網址（<code>GAS_ENDPOINT</code>）。部署 <code>gas/Code.gs</code> 後填入即可啟用。</div>'
-        return
-      }
-      try {
-        const res = await fetch(`${GAS_ENDPOINT}?action=guestbook`)
-        const data = await res.json()
-        if (data && data.ok) {
-          renderGuestbook(data.items)
-        } else {
-          guestbookListEl.innerHTML = '<div class="guestbook-empty">無法讀取留言，請稍後再試。</div>'
-        }
-      } catch (err) {
-        guestbookListEl.innerHTML = '<div class="guestbook-empty">讀取留言失敗，請確認 GAS 部署權限。</div>'
       }
     }
 
@@ -1621,8 +1564,7 @@
           gbNameInput.value = ''
           gbMessageInput.value = ''
           gbStatusEl.className = 'guestbook-status ok'
-          gbStatusEl.textContent = '留言已送出！'
-          await loadGuestbook()
+          gbStatusEl.textContent = '留言已送出！感謝您的交流。'
         } else {
           gbStatusEl.className = 'guestbook-status err'
           gbStatusEl.textContent = (data && data.error) || '送出失敗，請稍後再試。'
@@ -1643,7 +1585,6 @@
     renderFilters()
     renderPortfolio()
     recordVisit()
-    loadGuestbook()
   </script>
 </body>
 
