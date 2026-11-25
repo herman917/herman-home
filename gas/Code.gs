@@ -118,7 +118,7 @@ function doGet(e) {
     if (lastRow <= 1) {
       return jsonResponse({ ok: true, items: [] })
     }
-    const startRow = Math.max(2, lastRow - 29)
+    const startRow = 2
     const numRows = lastRow - startRow + 1
     const values = sheet.getRange(startRow, 1, numRows, 3).getValues()
     const items = values.reverse().map(function (row) {

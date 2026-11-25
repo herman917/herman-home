@@ -662,7 +662,86 @@
        7.5 訪客留言板（Guestbook）
        ========================================================================== */
     .guestbook-layout {
-      max-width: 560px;
+      max-width: 680px;
+    }
+
+    .guestbook-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .btn-view-gb {
+      align-self: flex-start;
+      padding: 7px 14px;
+      font-size: 0.85rem;
+      cursor: pointer;
+    }
+
+    .guestbook-list-panel.hidden {
+      display: none;
+    }
+
+    .pwd-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 1100;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      background: rgba(2, 6, 23, 0.72);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+
+    .pwd-modal.hidden {
+      display: none;
+    }
+
+    .pwd-card {
+      width: min(340px, 92vw);
+      padding: 24px;
+      border-radius: var(--radius-md);
+      background: var(--surface-glass-hover);
+      border: 1px solid var(--border-glass);
+      box-shadow: var(--shadow-card);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .pwd-card h3 {
+      font-size: 1.08rem;
+      margin: 0;
+    }
+
+    .pwd-card input {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid var(--border-glass);
+      background: rgba(15, 23, 42, 0.45);
+      color: var(--text-primary);
+      font-size: 1.05rem;
+      letter-spacing: 0.2em;
+      text-align: center;
+    }
+
+    html[data-theme='light'] .pwd-card input {
+      background: rgba(255, 255, 255, 0.9);
+    }
+
+    .pwd-error {
+      min-height: 1.1em;
+      font-size: 0.82rem;
+      color: #f87171;
+    }
+
+    .pwd-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
     }
 
     .guestbook-card {
@@ -1098,7 +1177,6 @@
           <p class="section-eyebrow">Guestbook</p>
           <h2 class="section-title" id="guestbookHeading">訪客留言板</h2>
         </div>
-        <p class="section-subtitle">歡迎留下交流訊息</p>
       </div>
 
       <div class="guestbook-layout">
@@ -1112,12 +1190,21 @@
               <label for="gbMessage">留言內容</label>
               <textarea id="gbMessage" maxlength="500" placeholder="寫下想說的話..." required></textarea>
             </div>
-            <button id="gbSubmitBtn" class="btn-primary" type="submit"
-              style="border:none;cursor:pointer;justify-content:center;">
-              送出留言
-            </button>
+            <div class="guestbook-actions">
+              <button id="gbSubmitBtn" class="btn-primary" type="submit"
+                style="border:none;cursor:pointer;justify-content:center;">
+                送出留言
+              </button>
+              <button id="gbViewBtn" class="btn-ghost btn-view-gb" type="button">
+                查看留言
+              </button>
+            </div>
             <div id="gbStatus" class="guestbook-status" aria-live="polite"></div>
           </form>
+        </div>
+
+        <div id="guestbookPanel" class="guestbook-card guestbook-list-panel hidden" style="margin-top: 16px;">
+          <div id="guestbookList" class="guestbook-list"></div>
         </div>
       </div>
     </section>
@@ -1162,6 +1249,19 @@
         <polyline points="9 18 15 12 9 6" />
       </svg>
     </button>
+  </div>
+
+  <!-- 查看留言密碼驗證視窗 -->
+  <div id="gbPwdModal" class="pwd-modal hidden" role="dialog" aria-modal="true" aria-labelledby="gbPwdTitle">
+    <div class="pwd-card">
+      <h3 id="gbPwdTitle">請輸入密碼查看留言</h3>
+      <input id="gbPwdInput" type="password" inputmode="numeric" maxlength="4" placeholder="••••" autocomplete="off" />
+      <div id="gbPwdError" class="pwd-error" aria-live="polite"></div>
+      <div class="pwd-actions">
+        <button id="gbPwdCancel" class="btn-ghost" type="button" style="padding:7px 14px;cursor:pointer;">取消</button>
+        <button id="gbPwdConfirm" class="btn-primary" type="button" style="padding:7px 16px;border:none;cursor:pointer;">確認</button>
+      </div>
+    </div>
   </div>
 
   <script>
@@ -1569,6 +1669,9 @@
           gbMessageInput.value = ''
           gbStatusEl.className = 'guestbook-status ok'
           gbStatusEl.textContent = '留言已送出！感謝您的交流。'
+          if (gbUnlocked && !guestbookPanelEl.classList.contains('hidden')) {
+            await loadGuestbook()
+          }
         } else {
           gbStatusEl.className = 'guestbook-status err'
           gbStatusEl.textContent = (data && data.error) || '送出失敗，請稍後再試。'
@@ -1579,6 +1682,110 @@
       } finally {
         gbSubmitBtn.disabled = false
       }
+    })
+
+    // 查看留言密碼驗證與展開邏輯
+    const gbViewBtn = document.getElementById('gbViewBtn')
+    const guestbookPanelEl = document.getElementById('guestbookPanel')
+    const guestbookListEl = document.getElementById('guestbookList')
+    const gbPwdModal = document.getElementById('gbPwdModal')
+    const gbPwdInput = document.getElementById('gbPwdInput')
+    const gbPwdError = document.getElementById('gbPwdError')
+    const gbPwdCancel = document.getElementById('gbPwdCancel')
+    const gbPwdConfirm = document.getElementById('gbPwdConfirm')
+
+    let gbUnlocked = false
+
+    function escapeHtml(str) {
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+    }
+
+    function renderGuestbook(items) {
+      if (!items || items.length === 0) {
+        guestbookListEl.innerHTML = '<div class="guestbook-empty">目前尚無留言。</div>'
+        return
+      }
+      guestbookListEl.innerHTML = items
+        .map(
+          (item) => `
+          <div class="guestbook-item">
+            <div class="guestbook-item-head">
+              <span class="guestbook-author">${escapeHtml(item.name)}</span>
+              <span class="guestbook-time">${escapeHtml(item.time)}</span>
+            </div>
+            <div class="guestbook-msg">${escapeHtml(item.message)}</div>
+          </div>
+        `
+        )
+        .join('')
+    }
+
+    async function loadGuestbook() {
+      guestbookListEl.innerHTML = '<div class="guestbook-empty">載入留言中...</div>'
+      try {
+        const res = await fetch(`${GAS_ENDPOINT}?action=guestbook`)
+        const data = await res.json()
+        if (data && data.ok) {
+          renderGuestbook(data.items)
+        } else {
+          guestbookListEl.innerHTML = '<div class="guestbook-empty">無法讀取留言，請稍後再試。</div>'
+        }
+      } catch (err) {
+        guestbookListEl.innerHTML = '<div class="guestbook-empty">讀取留言失敗，請檢查連線。</div>'
+      }
+    }
+
+    function openPwdModal() {
+      gbPwdInput.value = ''
+      gbPwdError.textContent = ''
+      gbPwdModal.classList.remove('hidden')
+      requestAnimationFrame(() => gbPwdInput.focus())
+    }
+
+    function closePwdModal() {
+      gbPwdModal.classList.add('hidden')
+    }
+
+    async function submitPwd() {
+      if (gbPwdInput.value.trim() === '0917') {
+        gbUnlocked = true
+        closePwdModal()
+        guestbookPanelEl.classList.remove('hidden')
+        gbViewBtn.textContent = '隱藏留言'
+        await loadGuestbook()
+        return
+      }
+      gbPwdError.textContent = '密碼錯誤，請重新輸入'
+      gbPwdInput.focus()
+      gbPwdInput.select()
+    }
+
+    gbViewBtn.addEventListener('click', () => {
+      if (!gbUnlocked) {
+        openPwdModal()
+        return
+      }
+      const isHidden = guestbookPanelEl.classList.toggle('hidden')
+      gbViewBtn.textContent = isHidden ? '查看留言' : '隱藏留言'
+    })
+
+    gbPwdCancel.addEventListener('click', closePwdModal)
+    gbPwdConfirm.addEventListener('click', submitPwd)
+    gbPwdInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault()
+        submitPwd()
+      } else if (e.key === 'Escape') {
+        e.preventDefault()
+        closePwdModal()
+      }
+    })
+    gbPwdModal.addEventListener('click', (e) => {
+      if (e.target === gbPwdModal) closePwdModal()
     })
 
     // =========================================================================
