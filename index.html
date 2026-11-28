@@ -1235,27 +1235,9 @@
           <p class="hero-bio">
             蕭正凌, 一個平凡的終身學習者
           </p>
-          <div class="hero-meta-row">
-            <a class="hero-mail" href="mailto:herman917g@gmail.com">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <rect x="2" y="4" width="20" height="16" rx="2" />
-                <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7" />
-              </svg>
-              <span>herman917g@gmail.com</span>
-            </a>
-            <span class="visit-badge" title="累積瀏覽人次">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
-                <circle cx="12" cy="12" r="3" />
-              </svg>
-              <span>瀏覽人次：<strong id="visitCount">--</strong></span>
-            </span>
-          </div>
           <div class="hero-cta">
-            <a class="btn-primary" href="#portfolio">探索精選作品</a>
-            <a class="btn-ghost" href="#gallery">瀏覽照片走廊</a>
+            <a class="btn-primary" href="#portfolio">作品</a>
+            <a class="btn-ghost" href="#gallery">照片</a>
           </div>
         </div>
       </div>
@@ -1268,7 +1250,6 @@
           <p class="section-eyebrow">Photo Gallery</p>
           <h2 class="section-title" id="galleryHeading">照片走廊</h2>
         </div>
-        <p class="section-subtitle">點擊任一張照片可放大檢視，支援鍵盤與手機滑動切換</p>
       </div>
 
       <div id="galleryGrid" class="gallery-grid" role="list"></div>
@@ -1411,6 +1392,7 @@
       'photo/herman03.jpg',
       'photo/herman04.jpg',
       'photo/herman05.jpg',
+      'photo/herman06.jpg',
     ]
 
     // =========================================================================
@@ -1780,8 +1762,8 @@
 
     function setVisitDisplay(val) {
       const text = val === null || val === undefined ? '--' : Number(val).toLocaleString()
-      visitCountEl.textContent = text
-      footerVisitCountEl.textContent = text
+      if (visitCountEl) visitCountEl.textContent = text
+      if (footerVisitCountEl) footerVisitCountEl.textContent = text
     }
 
     async function recordVisit() {
