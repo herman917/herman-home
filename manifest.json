@@ -1,0 +1,24 @@
+{
+  "name": "Herman Hsiao（蕭正凌）",
+  "short_name": "Herman Hsiao",
+  "description": "蕭正凌（正凌 / Herman Hsiao）的個人首頁與精選網頁作品集",
+  "start_url": "/herman-home/",
+  "scope": "/herman-home/",
+  "display": "standalone",
+  "background_color": "#070b14",
+  "theme_color": "#070b14",
+  "icons": [
+    {
+      "src": "photo/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "photo/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

@@ -12,6 +12,9 @@
   <meta property="og:description" content="Herman Hsiao（正凌）的個人首頁 — 健康、快樂、學習，收錄生活紀錄與精選網頁作品集。" />
   <meta property="og:url" content="https://herman917.github.io/herman-home/" />
   <meta property="og:image" content="https://herman917.github.io/herman-home/photo/herman.jpg" />
+  <meta name="theme-color" content="#070b14" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="apple-touch-icon" href="photo/icon-192.png" />
   <title>蕭正凌（正凌）｜Herman Hsiao</title>
   <script type="application/ld+json">
     {
@@ -229,6 +232,34 @@
     }
 
     .theme-toggle svg {
+      width: 17px;
+      height: 17px;
+      flex-shrink: 0;
+    }
+
+    .icon-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 36px;
+      height: 36px;
+      padding: 0;
+      border-radius: 50%;
+      border: 1px solid var(--border-glass);
+      background: var(--surface-glass);
+      color: var(--text-primary);
+      cursor: pointer;
+      transition: border-color var(--transition), box-shadow var(--transition), transform var(--transition), color var(--transition);
+    }
+
+    .icon-btn:hover {
+      color: var(--accent);
+      border-color: var(--border-glow);
+      box-shadow: var(--shadow-glow);
+      transform: translateY(-1px);
+    }
+
+    .icon-btn svg {
       width: 17px;
       height: 17px;
       flex-shrink: 0;
@@ -658,6 +689,47 @@
       transform: translate(3px, -2px);
     }
 
+    .project-card-cover {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      border-radius: inherit;
+    }
+
+    .project-actions {
+      position: relative;
+      z-index: 2;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .project-shortcut-btn {
+      display: inline-grid;
+      place-items: center;
+      width: 30px;
+      height: 30px;
+      border-radius: 8px;
+      border: 1px solid var(--border-glass);
+      background: var(--surface-glass);
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: color var(--transition), border-color var(--transition), background-color var(--transition), transform var(--transition);
+    }
+
+    .project-shortcut-btn:hover {
+      color: var(--accent);
+      border-color: var(--border-glow);
+      background: var(--accent-soft);
+      transform: translateY(-1px);
+    }
+
+    .project-shortcut-btn svg {
+      width: 15px;
+      height: 15px;
+    }
+
     /* ==========================================================================
        7.5 訪客留言板（Guestbook）
        ========================================================================== */
@@ -742,6 +814,42 @@
       display: flex;
       justify-content: flex-end;
       gap: 8px;
+    }
+
+    .shortcut-card {
+      width: min(410px, 92vw);
+    }
+
+    .shortcut-target {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--accent);
+      word-break: break-word;
+    }
+
+    .shortcut-steps {
+      margin: 0;
+      padding-left: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      line-height: 1.55;
+    }
+
+    .shortcut-steps strong {
+      color: var(--text-primary);
+    }
+
+    .shortcut-copy-status {
+      min-height: 1.1em;
+      font-size: 0.82rem;
+      color: #34d399;
+    }
+
+    .hidden {
+      display: none !important;
     }
 
     .guestbook-card {
@@ -1091,6 +1199,15 @@
       </nav>
 
       <div class="nav-actions">
+        <button id="installHomeBtn" class="icon-btn" type="button" aria-label="將本頁加到手機桌面" title="加到手機桌面">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+            stroke-linejoin="round" aria-hidden="true">
+            <rect x="6" y="2" width="12" height="20" rx="2.5" />
+            <line x1="12" y1="18" x2="12.01" y2="18" />
+            <path d="M12 8v5" />
+            <path d="M9.5 10.5H14.5" />
+          </svg>
+        </button>
         <button id="themeToggle" class="theme-toggle" type="button" aria-label="切換深色或淺色模式" title="切換深色／淺色模式">
           <svg id="themeIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
             stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"></svg>
@@ -1261,6 +1378,21 @@
       <div class="pwd-actions">
         <button id="gbPwdCancel" class="btn-ghost" type="button" style="padding:7px 14px;cursor:pointer;">取消</button>
         <button id="gbPwdConfirm" class="btn-primary" type="button" style="padding:7px 16px;border:none;cursor:pointer;">確認</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 加到手機桌面引導視窗 -->
+  <div id="shortcutModal" class="pwd-modal hidden" role="dialog" aria-modal="true" aria-labelledby="shortcutTitle">
+    <div class="pwd-card shortcut-card">
+      <h3 id="shortcutTitle">加到手機桌面捷徑</h3>
+      <div id="shortcutTarget" class="shortcut-target"></div>
+      <ol id="shortcutSteps" class="shortcut-steps"></ol>
+      <div id="shortcutCopyStatus" class="shortcut-copy-status" aria-live="polite"></div>
+      <div class="pwd-actions" style="flex-wrap: wrap;">
+        <button id="shortcutCopyBtn" class="btn-ghost" type="button" style="padding:7px 14px;cursor:pointer;">複製網址</button>
+        <a id="shortcutOpenBtn" class="btn-primary hidden" href="#" target="_blank" rel="noopener noreferrer" style="padding:7px 16px;">前往開啟</a>
+        <button id="shortcutCloseBtn" class="btn-ghost" type="button" style="padding:7px 14px;cursor:pointer;">關閉</button>
       </div>
     </div>
   </div>
@@ -1568,12 +1700,8 @@
 
       portfolioGrid.innerHTML = ''
       filtered.forEach((project) => {
-        const card = document.createElement('a')
+        const card = document.createElement('article')
         card.className = 'project-card'
-        card.href = project.url
-        card.target = '_blank'
-        card.rel = 'noopener noreferrer'
-        card.setAttribute('aria-label', `${project.title}（在新分頁開啟）`)
 
         const tagsHtml = project.tags
           .map((tag) => `<span class="tag-pill">${tag}</span>`)
@@ -1582,15 +1710,33 @@
         const iconSvg = iconMap[project.icon] || iconMap.chart
 
         card.innerHTML = `
+          <a class="project-card-cover" href="${project.url}" target="_blank" rel="noopener noreferrer" aria-label="${project.title}（在新分頁開啟）"></a>
           <div class="project-top">
             <div class="project-head-left">
               <div class="project-icon" aria-hidden="true">${iconSvg}</div>
               <h3 class="project-title">${project.title}</h3>
             </div>
-            <span class="project-arrow" aria-hidden="true">↗</span>
+            <div class="project-actions">
+              <button class="project-shortcut-btn" type="button" aria-label="將「${project.title}」加到手機桌面" title="加到手機桌面">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <rect x="6" y="2" width="12" height="20" rx="2.5" />
+                  <path d="M12 8v5" />
+                  <path d="M9.5 10.5H14.5" />
+                </svg>
+              </button>
+              <span class="project-arrow" aria-hidden="true">↗</span>
+            </div>
           </div>
           <div class="project-tags">${tagsHtml}</div>
         `
+
+        const shortcutBtn = card.querySelector('.project-shortcut-btn')
+        shortcutBtn.addEventListener('click', (e) => {
+          e.preventDefault()
+          e.stopPropagation()
+          openShortcutGuide(project.title, project.url, false)
+        })
+
         portfolioGrid.appendChild(card)
       })
     }
@@ -1795,6 +1941,133 @@
     })
     gbPwdModal.addEventListener('click', (e) => {
       if (e.target === gbPwdModal) closePwdModal()
+    })
+
+    // =========================================================================
+    // 5.5 加到手機桌面捷徑（PWA 一鍵安裝 + iOS/外部作品引導）
+    // =========================================================================
+    const installHomeBtn = document.getElementById('installHomeBtn')
+    const shortcutModal = document.getElementById('shortcutModal')
+    const shortcutTargetEl = document.getElementById('shortcutTarget')
+    const shortcutStepsEl = document.getElementById('shortcutSteps')
+    const shortcutCopyStatusEl = document.getElementById('shortcutCopyStatus')
+    const shortcutCopyBtn = document.getElementById('shortcutCopyBtn')
+    const shortcutOpenBtn = document.getElementById('shortcutOpenBtn')
+    const shortcutCloseBtn = document.getElementById('shortcutCloseBtn')
+
+    let deferredInstallPrompt = null
+    let currentShortcutUrl = window.location.href
+
+    window.addEventListener('beforeinstallprompt', (e) => {
+      e.preventDefault()
+      deferredInstallPrompt = e
+    })
+
+    window.addEventListener('appinstalled', () => {
+      deferredInstallPrompt = null
+    })
+
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js').catch(() => {})
+      })
+    }
+
+    function getShortcutSteps(isHome) {
+      const ua = navigator.userAgent || ''
+      const isInApp = /Line\/|FBAN|FBAV|Instagram/i.test(ua)
+      const isIOS = /iPhone|iPad|iPod/i.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
+      const isAndroid = /Android/i.test(ua)
+
+      if (isInApp) {
+        return [
+          '目前為 App 內建瀏覽器，請點右上或右下選單選擇 <strong>「以 Safari / Chrome 開啟」</strong>。',
+          isHome
+            ? '開啟後再點瀏覽器的 <strong>「加入主畫面」</strong> 即可建立桌面捷徑。'
+            : '先點下方 <strong>「前往開啟」</strong> 進入該作品，再於瀏覽器選單點 <strong>「加入主畫面」</strong>。',
+        ]
+      }
+
+      if (isIOS) {
+        return isHome
+          ? [
+              '點擊 Safari 下方（或右上角）的 <strong>分享圖示（↑）</strong>。',
+              '往下滑動選擇 <strong>「加入主畫面」</strong> → 右上角 <strong>「新增」</strong>。',
+            ]
+          : [
+              '點擊下方 <strong>「前往開啟」</strong> 進入該作品頁面。',
+              '在作品頁面點 Safari <strong>分享圖示（↑）</strong> → <strong>「加入主畫面」</strong>。',
+            ]
+      }
+
+      if (isAndroid) {
+        return isHome
+          ? [
+              '點擊 Chrome 右上角 <strong>⋮ 選單</strong>。',
+              '選擇 <strong>「加到主畫面」</strong>（或「安裝應用程式」）即可。',
+            ]
+          : [
+              '點擊下方 <strong>「前往開啟」</strong> 進入該作品頁面。',
+              '在作品頁面點 Chrome 右上角 <strong>⋮ 選單</strong> → <strong>「加到主畫面」</strong>。',
+            ]
+      }
+
+      return isHome
+        ? [
+            '在電腦版 Chrome / Edge 位址列右側點擊 <strong>「安裝」圖示</strong>，或於手機開啟本頁。',
+            '手機 Chrome 可由選單 <strong>「加到主畫面」</strong>、iOS Safari 可由 <strong>「分享 → 加入主畫面」</strong> 建立捷徑。',
+          ]
+        : [
+            '手機請先點下方 <strong>「前往開啟」</strong> 進入該作品頁面（瀏覽器安全限制需在該頁面操作）。',
+            '開啟後於手機瀏覽器選單點 <strong>「加到主畫面」</strong> 即可建立該作品的桌面捷徑。',
+          ]
+    }
+
+    function openShortcutGuide(title, url, isHome) {
+      currentShortcutUrl = url
+      shortcutTargetEl.textContent = title
+      shortcutCopyStatusEl.textContent = ''
+      shortcutStepsEl.innerHTML = getShortcutSteps(isHome).map((s) => `<li>${s}</li>`).join('')
+      if (isHome) {
+        shortcutOpenBtn.classList.add('hidden')
+      } else {
+        shortcutOpenBtn.href = url
+        shortcutOpenBtn.classList.remove('hidden')
+      }
+      shortcutModal.classList.remove('hidden')
+    }
+
+    function closeShortcutModal() {
+      shortcutModal.classList.add('hidden')
+    }
+
+    installHomeBtn.addEventListener('click', async () => {
+      if (deferredInstallPrompt) {
+        deferredInstallPrompt.prompt()
+        await deferredInstallPrompt.userChoice
+        deferredInstallPrompt = null
+        return
+      }
+      openShortcutGuide('Herman Hsiao（蕭正凌）個人首頁', window.location.href, true)
+    })
+
+    shortcutCopyBtn.addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(currentShortcutUrl)
+        shortcutCopyStatusEl.textContent = '已複製網址！'
+      } catch (err) {
+        shortcutCopyStatusEl.textContent = '複製失敗，請手動複製。'
+      }
+    })
+
+    shortcutCloseBtn.addEventListener('click', closeShortcutModal)
+    shortcutModal.addEventListener('click', (e) => {
+      if (e.target === shortcutModal) closeShortcutModal()
+    })
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && !shortcutModal.classList.contains('hidden')) {
+        closeShortcutModal()
+      }
     })
 
     // =========================================================================
