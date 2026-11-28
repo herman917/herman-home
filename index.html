@@ -1248,7 +1248,7 @@
       <div class="section-header">
         <div>
           <p class="section-eyebrow">Photo Gallery</p>
-          <h2 class="section-title" id="galleryHeading">照片走廊</h2>
+          <h2 class="section-title" id="galleryHeading">照片</h2>
         </div>
       </div>
 
@@ -1260,7 +1260,7 @@
       <div class="section-header">
         <div>
           <p class="section-eyebrow">Selected Works</p>
-          <h2 class="section-title" id="portfolioHeading">精選作品集</h2>
+          <h2 class="section-title" id="portfolioHeading">作品</h2>
         </div>
 
         <div class="filter-bar" id="filterBar" role="tablist" aria-label="作品分類篩選"></div>
@@ -1693,10 +1693,6 @@
         const card = document.createElement('article')
         card.className = 'project-card'
 
-        const tagsHtml = project.tags
-          .map((tag) => `<span class="tag-pill">${tag}</span>`)
-          .join('')
-
         const iconSvg = iconMap[project.icon] || iconMap.chart
 
         card.innerHTML = `
@@ -1717,7 +1713,6 @@
               <span class="project-arrow" aria-hidden="true">↗</span>
             </div>
           </div>
-          <div class="project-tags">${tagsHtml}</div>
         `
 
         const shortcutBtn = card.querySelector('.project-shortcut-btn')
